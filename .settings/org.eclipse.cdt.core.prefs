@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+environment/project/0.1837416289/ESP_SDK_PATH/delimiter=\:
+environment/project/0.1837416289/ESP_SDK_PATH/operation=append
+environment/project/0.1837416289/ESP_SDK_PATH/value=/home/dejarp/Documents/esp8266/esp-open-sdk/sdk
+environment/project/0.1837416289/PATH/delimiter=\:
+environment/project/0.1837416289/PATH/operation=replace
+environment/project/0.1837416289/PATH/value=/home/dejarp/Documents/esp8266/esp-open-sdk/esptool\:/usr/local/bin\:/usr/bin\:/bin\:/usr/local/games\:/usr/games\:${PATH}\:/home/dejarp/Documents/esp8266/esp-open-sdk/xtensa-lx106-elf/bin
+environment/project/0.1837416289/append=true
+environment/project/0.1837416289/appendContributed=true

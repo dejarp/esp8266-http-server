@@ -6,19 +6,12 @@
 #include "user_interface.h"
 #include "espconn.h"
 #include "mem.h"
-// #include "http_parser.h"
-
-
 
 static const int pin = 2;
 static volatile os_timer_t some_timer;
 // connection must be defined globally because if you define it within the scope of
 // a function it will leave scope, but things will still be attempting to access it
 struct espconn connection;
-
-
-//http_parser_settings settings;
-//http_parser parser;
 
 void ICACHE_FLASH_ATTR system_init_callback() {
   os_printf("System Initialized\n");
@@ -73,15 +66,8 @@ void ICACHE_FLASH_ATTR tcp_receive(void *arg, char *data, unsigned short length)
   os_printf( "sent response\n");
 }
 
-//int ICACHE_FLASH_ATTR on_body_parsed(http_parser *parser, const char *body, size_t length) {
-//  os_printf( "body parsed: \n%s\n", body );
-//}
-
 void ICACHE_FLASH_ATTR tcp_connected(void *arg) {
   struct espconn *connection = (struct espconn *)arg;
-
-  //settings.on_body = on_body_parsed;
-  //http_parser_init(&parser, HTTP_REQUEST);
 
   os_printf("tcp connection established\n");
 

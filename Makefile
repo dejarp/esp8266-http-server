@@ -1,44 +1,56 @@
 CC = xtensa-lx106-elf-gcc
-ESP_OPEN_SDK_DIR = ../esp-open-sdk/sdk
-HTTP_PARSER_DIR = ../http-parser
+ESP_SDK_PATH = ../esp-open-sdk/sdk
 CFLAGS = -I. -mlongcalls -DICACHE_FLASH \
 	-I$(ESP_SDK_PATH)/include \
 	-I$(ESP_SDK_PATH)/driver_lib/include/driver
 LDLIBS = -nostdlib -Wl,--start-group -lmain -lnet80211 -lwpa -llwip \
 	-lpp -lcirom -lphy -Wl,--end-group -lgcc -ldriver
 LDFLAGS = -Teagle.app.v6.ld
-COPY_FILES = $(ESP_SDK_PATH)/bin/blank.bin
+# This variable controls the name of generated binaries
+ESP_IMAGE_PREFIX = application-
+OBJ_DIR = ./obj
+BIN_DIR = ./bin
 
-.PHONY: rebuild
-rebuild: clean build
+# The esptool.py script elf2image command will output two images: 
+#	${ESP_IMAGE_PREFIX}0x00000.bin and
+#	${ESP_IMAGE_PREFIX}0x10000.bin
+# Thes should be loaded at the cooresponding addresses during flash
+build: ${OBJ_DIR}/esp8266HttpServer ${BIN_DIR}
+	esptool.py elf2image -o ${BIN_DIR}/${ESP_IMAGE_PREFIX} $<
 
-.PHONY: build
-build: esp8266HttpServer.bin blank.bin
+${BIN_DIR}:
+	mkdir $@
 
-esp8266HttpServer.bin: esp8266HttpServer
-	esptool.py elf2image $<
+${OBJ_DIR}/esp8266HttpServer: ${OBJ_DIR}/esp8266HttpServer.o
+	${CC} -o $@ $< ${LDFLAGS} ${LDLIBS}
 
-blank.bin: $(ESP_SDK_PATH)/bin/blank.bin
-	cp $< $@
+${OBJ_DIR}/esp8266HttpServer.o: esp8266HttpServer.c ${OBJ_DIR}
+	${CC} -o $@ -c $< ${CFLAGS} 
 
-esp8266HttpServer.bin: esp8266HttpServer.o
+${OBJ_DIR}:
+	mkdir $@
 
-esp8266HttpServer.o: esp8266HttpServer.c
-
-flash: esp8266HttpServer.bin
-	esptool.py -p /dev/ttyUSB0 write_flash --flash_mode dio \
-		0x00000 esp8266HttpServer-0x00000.bin \
-		0x10000 esp8266HttpServer-0x10000.bin \
-		0x7e000 blank.bin \
-		0x3fe000 blank.bin
+ESP_BOOT_ADDRESS = 0x00000
+ESP_USER_ADDRESS = 0x10000
+ESP_BOOT_IMAGE = ${BIN_DIR}/${ESP_IMAGE_PREFIX}${ESP_BOOT_ADDRESS}.bin
+ESP_USER_IMAGE = ${BIN_DIR}/${ESP_IMAGE_PREFIX}${ESP_USER_ADDRESS}.bin
+ESP_BLANK_IMAGE = $(ESP_SDK_PATH)/bin/blank.bin
+flash: ${ESP_BOOT_IMAGE} ${ESP_USER_IMAGE}
+	esptool.py -p /dev/ttyUSB0 -b 115200 write_flash --flash_mode dio \
+		${ESP_BOOT_ADDRESS} ${ESP_BOOT_IMAGE} \
+		${ESP_USER_ADDRESS} ${ESP_USER_IMAGE} \
+		0x7e000 ${ESP_BLANK_IMAGE} \
+		0x3fe000 ${ESP_BLANK_IMAGE}
 
 reset:
 	esptool.py run
 
 clean:
-	rm -f \
-		esp8266HttpServer \
-		esp8266HttpServer.o \
-		esp8266HttpServer-0x00000.bin \
-		esp8266HttpServer-0x10000.bin \
-		blank.bin
+	rm -rf \
+		${OBJ_DIR} \
+		${BIN_DIR}
+		
+.PHONY: rebuild
+rebuild: clean build
+		
+# TODO: This Makefile will not work outside of eclipse unless the ESP_SDK_PATH environment variable is set.

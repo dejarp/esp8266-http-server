@@ -57,7 +57,13 @@ reset:
 	esptool.py -p ${ESP_TOOL_PORT} -b ${ESP_TOOL_BAUD} run
 
 clean:
-	rm -rf ${OBJ_DIR} ${BIN_DIR}
+	rm -rf ${OBJ_DIR} ${BIN_DIR} http_parser.o http_parser_tests
 		
 # TODO: This Makefile will not work outside of eclipse unless the ESP_SDK_PATH 
 #	environment variable is set. Should probably do something to fix that.
+
+TCC = gcc
+TCFLAGS = -I. -I./Unity/src
+buildTests:
+	${TCC} http_parser.c http_parser_tests.c ./Unity/src/unity.c -o $@ ${TCFLAGS}
+	

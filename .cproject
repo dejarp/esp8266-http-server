@@ -28,9 +28,9 @@
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1682876121" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder">
 								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.148946389" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/home/dejarp/Documents/esp8266/esp-open-sdk/sdk/include"/>
 									<listOptionValue builtIn="false" value="/home/dejarp/Documents/esp8266/esp-open-sdk/sdk/driver_lib/include/driver"/>
 									<listOptionValue builtIn="false" value="/home/dejarp/Documents/esp8266/esp-open-sdk//xtensa-lx106-elf/xtensa-lx106-elf/sysroot/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/esp8266HttpServer/Unity/src&quot;"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1181825068" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>

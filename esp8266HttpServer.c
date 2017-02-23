@@ -6,6 +6,7 @@
 #include "user_interface.h"
 #include "espconn.h"
 #include "mem.h"
+#include "http_parser.h"
 
 static const int pin = 2;
 static volatile os_timer_t some_timer;
@@ -50,12 +51,14 @@ void ICACHE_FLASH_ATTR tcp_disconnect(void *arg) {
 
 char* response = "HTTP/1.1 200 OK\nContent-Length: 100\nContent-Type: text/html\nConnection: Closed\n\n<html><body><h1>Hello, World!</h1></body></html>\n";
 
+http_parser_settings settings;
+http_parser parser;
 void ICACHE_FLASH_ATTR tcp_receive(void *arg, char *data, unsigned short length) {
   struct espconn *connection = arg;
-  os_printf( "data recieved\n" );
+  os_printf( "data received\n" );
   os_printf( "%s\n", data );
 
-  //http_parser_execute(&parser, &settings, data, length);
+  http_parser_execute(&parser, &settings, data, length);
 
   os_printf( "Attempting to send response:\n%s\n", response );
 
@@ -66,10 +69,73 @@ void ICACHE_FLASH_ATTR tcp_receive(void *arg, char *data, unsigned short length)
   os_printf( "sent response\n");
 }
 
+int ICACHE_FLASH_ATTR on_message_begin(http_parser* parser) {
+	os_printf( "on_message_begin:\n");
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_url_parsed(http_parser* parser, const char *url, size_t length) {
+	os_printf( "on_url: %s\n", url);
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_status(http_parser* parser, const char *status, size_t length) {
+	os_printf( "on_status: %s\n", status);
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_header_field(http_parser* parser, const char *header, size_t length) {
+	os_printf( "on_header_field: %s\n", header );
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_header_value(http_parser* parser, const char *value, size_t length) {
+	os_printf( "on_header_value: %s\n", value );
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_headers_complete(http_parser* parser) {
+	os_printf( "on_headers_complete:\n" );
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_body(http_parser* parser, const char *body, size_t length) {
+	os_printf( "on_body: %s\n", body );
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_message_complete(http_parser* parser) {
+	os_printf( "on_message_complete:\n" );
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_chunk_header(http_parser* parser) {
+	os_printf( "on_chunk_header:\n" );
+	return 0;
+}
+
+int ICACHE_FLASH_ATTR on_chunk_complete(http_parser* parser) {
+	os_printf( "on_chunk_complete:\n" );
+	return 0;
+}
+
 void ICACHE_FLASH_ATTR tcp_connected(void *arg) {
   struct espconn *connection = (struct espconn *)arg;
 
-  os_printf("tcp connection established\n");
+  os_printf("TCP connection established\n");
+
+  settings.on_message_begin = on_message_begin;
+  settings.on_url = on_url_parsed;
+  settings.on_status = on_status;
+  settings.on_header_field = on_header_field;
+  settings.on_header_value = on_header_value;
+  settings.on_headers_complete = on_headers_complete;
+  settings.on_body = on_body;
+  settings.on_message_complete = on_message_complete;
+  settings.on_chunk_header = on_chunk_header;
+  settings.on_chunk_complete = on_chunk_complete;
+
+  http_parser_init(&parser, HTTP_REQUEST);
 
   espconn_regist_recvcb(connection, tcp_receive);
   espconn_regist_disconcb(connection, tcp_disconnect);

@@ -31,6 +31,7 @@
 									<listOptionValue builtIn="false" value="/home/dejarp/Documents/esp8266/esp-open-sdk/sdk/driver_lib/include/driver"/>
 									<listOptionValue builtIn="false" value="/home/dejarp/Documents/esp8266/esp-open-sdk//xtensa-lx106-elf/xtensa-lx106-elf/sysroot/usr/include"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/esp8266HttpServer/Unity/src&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/http-server&quot;"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1181825068" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>

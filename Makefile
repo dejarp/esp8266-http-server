@@ -1,10 +1,23 @@
 CC = xtensa-lx106-elf-gcc
 ESP_SDK_PATH = ../esp-open-sdk/sdk
+HTTP_PARSER_PATH = ./http-parser
 CFLAGS = -I. -mlongcalls -DICACHE_FLASH \
 	-I$(ESP_SDK_PATH)/include \
-	-I$(ESP_SDK_PATH)/driver_lib/include/driver
-LDLIBS = -nostdlib -Wl,--start-group -lmain -lnet80211 -lwpa -llwip \
-	-lpp -lcirom -lphy -Wl,--end-group -lgcc -ldriver
+	-I$(ESP_SDK_PATH)/driver_lib/include/driver \
+	-I$(HTTP_PARSER_PATH)
+LDLIBS = -L$(HTTP_PARSER_PATH) -nostdlib \
+	-Wl,--start-group \
+		-lmain \
+		-lnet80211 \
+		-lwpa \
+		-llwip \
+		-lpp \
+		-lphy \
+	-Wl,--end-group \
+		-lgcc \
+		-ldriver \
+		-lcirom \
+		-lhttp_parser
 LDFLAGS = -Teagle.app.v6.ld
 # This variable controls the name of generated binaries
 ESP_IMAGE_PREFIX = application-
@@ -18,6 +31,9 @@ ESP_USER_ADDRESS = 0x10000
 ESP_BOOT_IMAGE = ${BIN_DIR}/${ESP_IMAGE_PREFIX}${ESP_BOOT_ADDRESS}.bin
 ESP_USER_IMAGE = ${BIN_DIR}/${ESP_IMAGE_PREFIX}${ESP_USER_ADDRESS}.bin
 ESP_BLANK_IMAGE = ${BIN_DIR}/blank.bin
+
+.PHONY: build
+build: ${ESP_BOOT_IMAGE} ${ESP_USER_IMAGE}
 
 # The esptool.py script elf2image command will output two images: 
 #	${ESP_IMAGE_PREFIX}0x00000.bin and
@@ -36,11 +52,15 @@ ${ESP_BLANK_IMAGE}:
 ${BIN_DIR}:
 	mkdir $@
 
-${OBJ_DIR}/esp8266HttpServer: ${OBJ_DIR}/esp8266HttpServer.o
-	${CC} -o $@ $< ${LDFLAGS} ${LDLIBS}
+${OBJ_DIR}/esp8266HttpServer: \
+	${OBJ_DIR}/esp8266HttpServer.o
+		${CC} -o $@ $? ${LDFLAGS} ${LDLIBS}
 
 ${OBJ_DIR}/esp8266HttpServer.o: esp8266HttpServer.c ${OBJ_DIR}
 	${CC} -o $@ -c $< ${CFLAGS} 
+
+${OBJ_DIR}/http_parser.o: ${HTTP_PARSER_PATH}/http_parser.c ${OBJ_DIR}
+	${CC} -o $@ -c $< ${CFLAGS}
 
 ${OBJ_DIR}:
 	mkdir $@
@@ -66,4 +86,5 @@ TCC = gcc
 TCFLAGS = -I. -I./Unity/src
 buildTests:
 	${TCC} http_parser.c http_parser_tests.c ./Unity/src/unity.c -o $@ ${TCFLAGS}
+# TODO: get tests to work on ESP board
 	

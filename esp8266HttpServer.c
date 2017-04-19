@@ -85,7 +85,10 @@ int ICACHE_FLASH_ATTR on_status(http_parser* parser, const char *status, size_t 
 }
 
 int ICACHE_FLASH_ATTR on_header_field(http_parser* parser, const char *header, size_t length) {
-	os_printf( "on_header_field: %s\n", header );
+	char headerField[length+1];
+	os_strncpy(headerField, header, length);
+	headerField[length] = '\0';
+	os_printf( "on_header_field: %s\n", length, headerField );
 	return 0;
 }
 

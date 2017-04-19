@@ -4,4 +4,4 @@
 	ignore = dirty
 [submodule "http-parser"]
 	path = http-parser
-	url = https://github.com/nodejs/http-parser.git
+	url = https://github.com/dejarp/http-parser.git

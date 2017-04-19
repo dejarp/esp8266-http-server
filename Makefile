@@ -65,6 +65,7 @@ ${OBJ_DIR}/http_parser.o: ${HTTP_PARSER_PATH}/http_parser.c ${OBJ_DIR}
 ${OBJ_DIR}:
 	mkdir $@
 
+# make sure there are no serial monitors attached when executing this target
 flash: ${ESP_BOOT_IMAGE} ${ESP_USER_IMAGE} ${ESP_BLANK_IMAGE}
 	esptool.py -p ${ESP_TOOL_PORT} -b ${ESP_TOOL_BAUD} \
 		write_flash --flash_mode dio \
@@ -72,6 +73,10 @@ flash: ${ESP_BOOT_IMAGE} ${ESP_USER_IMAGE} ${ESP_BLANK_IMAGE}
 			${ESP_USER_ADDRESS} ${ESP_USER_IMAGE} \
 			0x7e000 ${ESP_BLANK_IMAGE} \
 			0x3fe000 ${ESP_BLANK_IMAGE}
+
+# Ctrl+A,K will kill the screen session 	
+monitor:
+	screen ${ESP_TOOL_PORT} ${ESP_TOOL_BAUD}
 
 reset:
 	esptool.py -p ${ESP_TOOL_PORT} -b ${ESP_TOOL_BAUD} run
